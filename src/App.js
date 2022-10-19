@@ -1,5 +1,6 @@
 import { type } from "@testing-library/user-event/dist/type";
 import { useEffect, useState, useRef } from "react";
+import useAxios from "./useAxios";
 
 //usestate
 /** function App() {
@@ -141,7 +142,7 @@ function App() {
 } */
 
 // usePreventLeave
-const usepreventLeave = () => {
+/** const usepreventLeave = () => {
   const listener = (event) => {
     event.returnValue = "";
   };
@@ -156,6 +157,185 @@ function App() {
     <div className="App">
       <button onClick={enablePrevent}>Protect</button>
       <button onClick={disablePrevent}>Unprotect</button>
+    </div>
+  );
+} */
+
+//useBeforeLeave
+/** const useBeforeLeave = (onBefore) => {
+  const handle = (event) => {
+    const { clientY } = event;
+    if (clientY <= 0) {
+      onBefore();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mouseleave", handle);
+    return () => document.removeEventListener("mouseleave", handle);
+  }, []);
+  if (typeof onBefore !== "function") {
+    return;
+  }
+};
+
+function App() {
+  const begForLife = () => console.log("Pls dint leave");
+  useBeforeLeave(begForLife);
+  return (
+    <div className="App">
+      <h1>hello</h1>
+    </div>
+  );
+} */
+
+// useFadeIn
+/** const useFadeIn = (duration = 1, delay = 0) => {
+  const element = useRef();
+  useEffect(() => {
+    if (element.current) {
+      const { current } = element;
+      current.style.transition = `opacity ${duration}s ease-in-out ${delay}`;
+      current.style.opacity = 1;
+    }
+  }, []);
+  if (typeof duration !== "number" || typeof delay !== "number") {
+    return;
+  }
+
+  return { ref: element, style: { opacity: 0 } };
+};
+
+function App() {
+  const fadeInH1 = useFadeIn(3, 2);
+  const fadeInP = useFadeIn(5, 10);
+  return (
+    <div className="App">
+      <h1 {...fadeInH1}>hello</h1>
+      <p {...fadeInP}>안녕하세요.</p>
+    </div>
+  );
+} */
+
+// useNetwrok
+/** const useNetwork = (onChange) => {
+  const [status, setStatus] = useState(navigator.onLine);
+  const handleChange = () => {
+    if (typeof onChange === "function") {
+      onChange(navigator.onLine);
+    }
+    setStatus(navigator.onLine);
+  };
+  useEffect(() => {
+    window.addEventListener("online", handleChange);
+    window.addEventListener("offline", handleChange);
+    return () => {
+      window.removeEventListener("online", handleChange);
+      window.removeEventListener("offline", handleChange);
+    };
+  }, []);
+
+  return status;
+};
+
+function App() {
+  const handleNetworkChange = (online) => {
+    console.log(online ? "We just went online" : "We are offline");
+  };
+  const onLine = useNetwork(handleNetworkChange);
+  return (
+    <div className="App">
+      <h1>{onLine ? "OnLine" : "Offline"}</h1>
+    </div>
+  );
+} */
+
+// useScroll
+/** const useScroll = () => {
+  const [state, setState] = useState({ x: 0, y: 0 });
+  const onScroll = () => {
+    setState({ x: window.scrollX, y: window.scrollY });
+  };
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  });
+  return state;
+};
+function App() {
+  const { y } = useScroll();
+  return (
+    <div className="App" style={{ height: "1000vh" }}>
+      <h1 style={{ position: "fixed", color: y > 100 ? "red" : "blue" }}>Hi</h1>
+    </div>
+  );
+} */
+// useFullscreen
+/** const useFullscreen = (callback) => {
+  const element = useRef();
+
+  const runCb = (isFull) => {
+    if (callback && typeof callback === "function") {
+      callback(isFull);
+    }
+  };
+  const triggerFull = () => {
+    if (element.current) {
+      element.current.requestFullscreen();
+      runCb(true);
+    }
+  };
+  const exitFull = () => {
+    document.exitFullscreen();
+    runCb(false);
+  };
+  return { element, triggerFull, exitFull };
+};
+
+function App() {
+  const [isScreen, setIsscreen] = useState(false);
+  const onFulls = (isFull) => {
+    console.log(isFull);
+    console.log(isFull ? "we are Full" : "we are small");
+    setIsscreen(isFull);
+  };
+  const { element, triggerFull, exitFull } = useFullscreen(onFulls);
+  return (
+    <div className="App" style={{ height: "1000vh" }}>
+      <div ref={element}>
+        <img src="https://i.ibb.co/R6RwNxx/grape.jpg" alt="grape" width="250" />
+        <button
+          style={{ display: isScreen ? "block" : "none" }}
+          onClick={exitFull}
+        >
+          Smallscreen
+        </button>
+      </div>
+      <button
+        style={{ display: isScreen ? "none" : "block" }}
+        onClick={triggerFull}
+      >
+        Make fullscreen
+      </button>
+    </div>
+  );
+} */
+// useAxios
+
+function App() {
+  const { loading, error, data, refetch } = useAxios({
+    url: "https://yts.mx/api/v2/list_movies.json",
+  });
+  console.log(
+    `loading:${loading}\nerror:${error}\ndata:${JSON.stringify(data)}`
+  );
+  return (
+    <div className="App">
+      <h1>{data && data.status}</h1>
+      <h2>{loading && "Loading.."}</h2>
+      <button onClick={refetch}>Refetch</button>
     </div>
   );
 }
